@@ -1,0 +1,68 @@
+<html>
+<nav  th:fragment="topNavi" class="navbar sticky-top m-0 p-0">
+    <div class="container-sm border-bottom" style="background-color: white;">
+      <a class="navbar-brand me-0" href="/fitnessfootball/mainPage">
+        <img class="img-fluid" src="/public/img/healthlike.png" style="height: 4em;">
+      </a>
+      <span class="me-4" style="font-weight: bold;">FITNESS FOOTBALL</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <!--if걸기 로그인 유저.-->
+        <div class="row mx-1" th:if="${session.user != null}"  style="background-color: rgb(236, 236, 236);">
+            <div class="col">
+                <div class="offcanvas-header fw-bold">
+                    <p th:text="${session.user.nickname}" class="offcanvas-title" id="offcanvasNavbarLabel"></p><span class="fw-bold"></span>님 오늘도 운동하셨나요?
+                    <!-- <p th:text="${session.manager.name}" class="offcanvas-title" id="offcanvasNavbarLabel"></p><span class="fw-bold"></span>님 오늘도 운동하셨나요? -->
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="row mt-2 pb-3 mx-1">
+                  <div class="col text-end">
+                    <a  type="button" class="btn btn-dark ms-2" href="/fitnessfootball/logOutProcess">로그아웃</a>
+                  </div>
+                  <div class="col">
+                    <a  type="button" class="btn btn-dark ms-2" href="/fitnessfootball/cartPage">내 장바구니</a>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <!--로그인 안했을 시-->
+        <div class="row" th:if="${session.user == null}">
+            <div class="col" >
+                <div class="row text-center border-bottom">
+                    <div class="col mb-3">
+                      <div class="offcanvas-header">
+                        <p class="offcanvas-title" id="offcanvasNavbarLabel"><span class="fw-bold">오늘도 운동하셨나요?</span></p>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                      </div>
+                        <a th:href="@{/fitnessfootball/registerPage}" type="button" class="btn btn-primary ms-2">회원가입</a>
+                        <a th:href="@{/fitnessfootball/loginPage}" type="button" class="btn btn-light ms-2" style="border-color:black ;">로그인</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a class="nav-link active fw-bold" aria-current="page" href="/fitnessfootball/mainPage">홈</a>
+            </li>
+            <!-- <li class="nav-item mt-2">
+              <a class="nav-link active fw-bold" href="#">마이페이지</a>
+            </li> -->
+            <li class="nav-item mt-2">
+              <a class="nav-link active fw-bold" href="/fitnessfootball/shopPage">상품</a>
+            </li>
+            <li class="nav-item mt-2">
+              <a class="nav-link active fw-bold" href="/fitnessfootball/boardPage">운동공유방<i class="bi bi-camera2 ms-2"></i></a>
+            </li>
+            <li class="nav-item mt-2">
+              <a class="nav-link active fw-bold" href="#">레슨신청<span class="animate-pulse text-xs text-pink-500 ms-2 fw-bold" style="color: red; font-size: 0.75rem;">HOT</span></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  </html>

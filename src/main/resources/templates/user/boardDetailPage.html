@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <title>게시글 상세 페이지</title>
+    <script>
+    let sessionId = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get("id");
+
+        function good(){
+        fetch(`/api/user/goodd?article_id=${articleId}`)
+          .then((r) => r.json())
+          .then((response) => {
+            const good = document.getElementById("good");
+            good.classList.remove("bi-hand-thumbs-up");
+            good.classList.add("bi-hand-thumbs-up-fill"); 
+            good.setAttribute("onclick","un_good()");
+            reloadTotalCount();
+            // reloadMyLike();
+          });
+        }
+
+        function un_good(){
+            fetch(`/api/user/ungood?article_id=${articleId}`)
+            .then((r) => r.json())
+            .then((response) => {
+            const good = document.getElementById("good");
+            good.classList.remove("bi-hand-thumbs-up-fill");
+            good.classList.add("bi-hand-thumbs-up");
+            good.setAttribute("onclick","good()");
+            reloadTotalCount();
+            // reloadMyLike();
+          });
+
+        }
+
+        function isGood(){
+            fetch(`/api/user/isGood?article_id=${articleId}`)
+            .then((r) => r.json())
+            .then((response) => {
+                if(response.data.isGood){
+                    const good = document.getElementById("good");
+                    good.classList.remove("bi-hand-thumbs-up");
+                    good.classList.add("bi-hand-thumbs-up-fill"); 
+                    good.setAttribute("onclick","un_good()");
+                    reloadTotalCount();
+                }else{
+                    const good = document.getElementById("good");
+                    good.classList.remove("bi-hand-thumbs-up-fill");
+                    good.classList.add("bi-hand-thumbs-up");
+                    good.setAttribute("onclick","good()");
+                    reloadTotalCount();
+                }
+            // reloadMyLike();
+          });
+        }
+
+        function reloadTotalCount(){
+            fetch(`/api/user/getTotalLikeCount?articleId=${articleId}`)
+            .then((r) => r.json())
+            .then((response) => {
+                const count = document.getElementById("abcd");
+                count.innerText = response.data.count;
+                
+            });
+        }
+        window.addEventListener("DOMContentLoaded", () => {
+        //페이지 로드 완료 시점에서 실행될 코드, 초기화 코드
+          reloadTotalCount();
+          isGood();
+        })
+
+    </script>
+  </head>
+  <body>
+    <!-- 네비게이션 바 -->
+    <div th:replace="~{common/navi::topNavi}"></div>
+    <div style="height: 2rem;"></div>
+
+    <!-- 게시글 상세 페이지 -->
+    <div class="container">
+      <div class="card">
+        <div class="card-header text-black">
+          <span class="fw-bold" th:text="${board.boardDto.title}">게시글 제목</span>
+        </div>
+        <div class="card-body">
+          <!-- 작성자 및 작성일 -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+            <span th:text="${board.userDto.nickname}">작성자명</span> <span><i class="bi bi-eye ms-3"></i></span><span class="ms-2" th:text="${board.boardDto.read_count}">0</span>
+            </div>
+            <div>
+                <span th:text="${board.boardDto.formattedCreatedAt}"></span>
+            </div>
+          </div>
+
+          <!-- 조회수 -->
+          <div class="mb-3">
+           
+          </div>
+
+          <!-- 내용 -->
+          <div>
+            <p style="color: gray;" class="mt-2" th:text="${board.boardDto.content}">
+              게시글 내용이 여기에 표시됩니다.
+            </p>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+            <span><i onclick="good()" id="good" class="bi bi-hand-thumbs-up fs-3 me-5 pe-3"></i><span id="abcd">3</span></span>
+            <!-- <span><i class="bi bi-hand-thumbs-up-fill"></i></span> -->
+          <form th:action="@{/fitnessfootball/updatePage(id=${board.boardDto.id})}" method="get" class="d-inline">
+            <button th:if="${userDto != null && userDto != null && userDto.id == board.boardDto.user_id}" type="submit" class="btn btn-primary">수정</button>
+            <!--조건 3개가 다 맞아야 됨.-->
+          </form>
+          <form th:action="@{/fitnessfootball/deleteProcess(id=${board.boardDto.id})}" method="post" class="d-inline">
+            <button th:if="${userDto != null && userDto != null && userDto.id == board.boardDto.user_id}"  type="submit" class="btn btn-primary">삭제</button>
+            <!--조건 3개가 다 맞아야 됨.-->
+          </form>
+          <a href="/fitnessfootball/mainPage" class="btn btn-secondary">목록으로</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer 추가 -->
+    <footer class="border-top text-lg-start text-lg-start mt-5" style="font-size: 0.9rem;">
+      <div class="container p-4">
+        <!-- Footer Links -->
+        <div class="row">
+          <div class="col-lg-6 col-md-12 mb-2 mb-md-0">
+            <!-- 이미지와 아이콘 정렬 -->
+            <div class="row">
+              <div class="col text-end me-5">
+                <img class="img-fluid" src="/public/img/healthlike.png" style="height: 7em;">
+                <a href="https://www.facebook.com/login/identify/" class="text-secondary me-2"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.youtube.com/watch?v=3PaS86BZPX8&t=2069s" class="text-secondary me-2"><i class="bi bi-youtube"></i></a>
+              </div>
+            </div>
+            <!-- 텍스트 정보 -->
+            <p class="text-secondary" style="font-size: small;">
+              상호명: (주)피트니스 풋볼 | 대표명: 권일민<br>
+              <br>
+              사업자등록번호: 592-87-02037<br>
+              <br>
+              통신판매업신고번호: 제 2022-서울강남-04742호<br>
+              <br>
+              직업정보 제공사업 신고번호: J1200020230009<br>
+              <br>
+              주소: 서울 강남구 중앙정보처리센터 7층 704호<br>
+              <br>
+              고객센터: 02-000-0000 <br>(영업시간 평일 10:00~17:00) 주말·공휴일 휴무<br>
+            </p>
+          </div>
+        </div>
+  
+        <!-- Copyright -->
+      </div>
+      <div class="text-center p-3 border-top mb-3" style="font-size: small;">
+        &copy; 2025 (주)풋볼코리아. All rights reserved.
+      </div>
+    </footer>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

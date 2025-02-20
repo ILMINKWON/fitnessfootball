@@ -1,0 +1,114 @@
+<!-- src/main/resources/templates/user/mainPage.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" >
+    <!--모바일 용 뷰포트-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/public/css/home/home.css}">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <title>상품 페이지</title>
+  </head>
+  <body>
+    <!-- 네비게이션 바 추가 -->
+    <div th:replace="~{common/navi::topNavi}"></div>
+
+    <!-- 메인 페이지 내용 -->
+    <div class="row mt-3 ms-2 me-2">
+      <div class="col-6 p-3 text-center" th:each="list : ${product}">
+        <a class="text-decoration-none text-black" th:href="@{/fitnessfootball/shopDetailPage(id=${list.productDto.id})}">
+          <div class="rounded p-2">
+            <!-- 상품 이미지 -->
+            <img th:src="|/uploadFiles/${list.productDto.image_link}|" alt="대표 이미지" class="img-fluid rounded">
+          </div>
+          <div class="mt-2">
+            <!-- 상품명 -->
+            <span class="d-block fw-normal fw-bold" th:text="${list.productDto.product_name}">상품명</span>
+            <!-- 원래 가격 -->
+            <p class="text-decoration-line-through small text-secondary my-0">
+                <span th:text="${#numbers.formatInteger(list.productDto.price + 50000, 0)}"></span>
+                <span class="text-secondary my-0">원</span>
+                <i class="bi bi-chevron-down ml-2"></i>
+              </p>
+            <!-- 할인된 가격 -->
+            <span class="fw-bold" style="color: red;">￦</span>
+            <span class="fw-bold" th:text="${list.productDto.formattedPrice}" style="color: red;"></span>
+            <span style="color: red;">원</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  
+   <!-- Footer 추가 -->
+   <footer class="border-top text-lg-start text-lg-start mt-5 mx-3" style="font-size: 0.8rem;">
+    <div class="container p-4">
+      <!-- Footer Links -->
+      <div class="row">
+        <div class="col-lg-6 col-md-12 mb-2 mb-md-0">
+          <!-- 이미지와 아이콘 정렬 -->
+          <div class="row">
+            <div class="col text-end me-5">
+              <img class="img-fluid" src="/public/img/healthlike.png" style="height: 7em;">
+              <a href="https://www.facebook.com/login/identify/" class="text-secondary me-2"><i class="bi bi-facebook"></i></a>
+              <a href="https://www.youtube.com/watch?v=3PaS86BZPX8&t=2069s" class="text-secondary me-2"><i class="bi bi-youtube"></i></a>
+            </div>
+          </div>
+          <!-- 텍스트 정보 -->
+          <p class="text-secondary" style="font-size: bold;">
+            상호명: (주)피트니스 풋볼 | 대표명: 권일민<br>
+            <br>
+            사업자등록번호: 592-87-02037<br>
+            <br>
+            통신판매업신고번호: 제 2022-서울강남-04742호<br>
+            <br>
+            직업정보 제공사업 신고번호: J1200020230009<br>
+            <br>
+            주소: 서울 강남구 중앙정보처리센터 7층 704호<br>
+            <br>
+            고객센터: 02-000-0000 <br>(영업시간 평일 10:00~17:00) 주말·공휴일 휴무<br>
+          </p>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+    </div>
+    <div class="text-center p-3 border-top mb-5 pb-5" style="font-size: small;">
+      &copy; 2025 (주)풋볼코리아. All rights reserved.
+    </div>
+    <div th:replace="~{common/bottomNav::userBottomNav}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</footer>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"
+  ></script>
+
+  <script>
+
+      const bi_gift = document.querySelector(".bi-gift");
+      const product = document.getElementById("product");
+
+      window.addEventListener("DOMContentLoaded", () => {
+        bi_gift.style.color = "black";
+        bi_gift.style.fontWeight = "bold"; // 글자 굵게
+        product.style.color = "black";
+        product.style.fontWeight = "bold";
+      });
+  </script>
+    
+  </body>
+</html>

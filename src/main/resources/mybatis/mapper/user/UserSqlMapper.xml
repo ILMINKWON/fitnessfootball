@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fitnessfootball.fitnessfootball.user.mapper.UserSqlMapper">
+
+    <insert id="createUser">
+        <selectKey resultType="int" keyProperty="id" order="AFTER">
+            SELECT MAX(id) FROM ff_user;
+        </selectKey>
+        INSERT INTO ff_user(user_id, password, nickname, name, email, gender, birth, phone_number,athletic_experience)
+        VALUES(#{user_id},#{password},#{nickname},#{name},#{email},#{gender},#{birth},#{phone_number},#{athletic_experience})
+    </insert>
+
+    <select id="managerIdAndPassword" resultType="com.fitnessfootball.fitnessfootball.dto.ManagerDto">
+        SELECT *
+        FROM ff_staff ffu
+        WHERE ffu.manager_id=#{manager_id} AND ffu.password =#{password};
+    </select>
+
+    <select id="userIdAndPassword" resultType="com.fitnessfootball.fitnessfootball.dto.UserDto">
+        SELECT *
+        FROM ff_user ffuu
+        WHERE ffuu.user_id=#{user_id} AND ffuu.password =#{password};
+    </select>
+
+    <select id="findInterestTagAll" resultType="com.fitnessfootball.fitnessfootball.dto.InterestTagDto">
+        SELECT * FROM ff_interest_tag ORDER BY id ASC;
+    </select>
+
+    <insert id="createUserInterest">
+        INSERT INTO ff_user_interest (user_id, tag_id)
+        VALUES(#{user_id}, #{tag_id})
+    </insert>
+
+    <insert id="createMagager">
+         INSERT INTO ff_staff(manager_id, password, name, phone_number)
+         VALUES(#{manager_id},#{password},#{name},#{phone_number})
+    </insert>
+
+    <insert id="createProduct">
+        <selectKey resultType="int" keyProperty="id" order="AFTER">
+            SELECT MAX(ffi.id) FROM ff_product ffi
+        </selectKey>
+         INSERT INTO ff_product(manager_id, product_name, productdescription, price, inventory,image_link)
+         VALUES(#{manager_id},#{product_name},#{productdescription},#{price},#{inventory},#{image_link})
+    </insert>
+
+    <insert id="createProductImage">
+
+        INSERT INTO ff_product_image(product_id,location,original_filename)
+        VALUES(#{product_id}, #{location}, #{original_filename});
+    </insert>
+
+    <select id="findImageByProductId" resultType="com.fitnessfootball.fitnessfootball.dto.ProductImageDto">
+        SELECT * FROM ff_product_image ffi
+        WHERE ffi.product_id = #{product_id};
+    </select>
+    
+    <select id="selectProduct" resultType="com.fitnessfootball.fitnessfootball.dto.ProductDto">
+        SELECT * FROM ff_product ORDER BY id DESC;
+    </select>
+
+    <select id="selectProductById" resultType="com.fitnessfootball.fitnessfootball.dto.ProductDto">
+        SELECT * FROM ff_product WHERE id = #{id}    
+    </select>
+
+    <select id="selectProductImageById" resultType="com.fitnessfootball.fitnessfootball.dto.ProductImageDto">
+        SELECT * FROM ff_product_image WHERE product_id = #{product_id}
+    </select>
+
+    <select id="selectProductdescription" resultType="string">
+        SELECT productdescription FROM ff_product WHERE id = #{id};
+    </select>
+
+    <select id="countUserByUserId" resultType="int">
+        SELECT COUNT(*) FROM ff_user ffuu WHERE ffuu.user_id = #{user_id};
+    </select>
+
+    <!--장바구니-->
+    <insert id="createCart">
+     INSERT INTO ff_cart(user_id, product_id) VALUES (#{user_id}, #{product_id});
+    </insert>
+
+    <delete id="deleteCart">
+        DELETE FROM ff_cart WHERE user_id = #{user_id} AND product_id = #{product_id};
+    </delete>
+
+    <select id="getTotalCart" resultType="int">
+        SELECT COUNT(*) FROM ff_cart WHERE product_id = #{product_id};
+    </select>
+
+    <select id="getMyCart" resultType="int">
+        SELECT COUNT(*) FROM ff_cart WHERE product_id= #{product_id} AND user_id = #{user_id};
+    </select>
+
+    <select id="myCartCount" resultType="int">
+        SELECT COUNT(*) FROM ff_cart WHERE  user_id = #{user_id};
+    </select>
+
+    <insert id="createBoard">
+        INSERT INTO ff_evaluation_article (user_id, title, read_count , content)
+        VALUES(#{user_id}, #{title}, 0, #{content})
+    </insert>
+
+    <select id="selectBoard" resultType="com.fitnessfootball.fitnessfootball.dto.BoardDto">
+        SELECT * FROM ff_evaluation_article ORDER BY id DESC;
+    </select>
+
+    <select id="selectUserId" resultType="com.fitnessfootball.fitnessfootball.dto.UserDto">
+        SELECT * FROM ff_user WHERE id = #{id};
+    </select>
+
+    <update id="readCountUp">
+       UPDATE ff_evaluation_article SET read_count = read_count + 1 WHERE id = #{id};
+    </update>
+
+    <select id="selectArticleId" resultType="com.fitnessfootball.fitnessfootball.dto.BoardDto">
+        SELECT * FROM ff_evaluation_article WHERE id = #{id}
+    </select>
+
+    <!--추천-->
+    <insert id="creategood">
+     INSERT INTO ff_recommendation(user_id, article_id) VALUES (#{user_id}, #{article_id});
+    </insert>
+
+    <delete id="deletegood">
+        DELETE FROM ff_recommendation WHERE user_id = #{user_id} AND article_id = #{article_id};
+    </delete>
+
+    <select id="getTotalgood" resultType="int">
+        SELECT COUNT(*) FROM ff_recommendation WHERE article_id = #{article_id};
+    </select>
+
+    <select id="getMygood" resultType="int">
+        SELECT COUNT(*) FROM ff_recommendation WHERE article_id= #{article_id} AND user_id = #{user_id};
+    </select>
+
+    <delete id="boardDelete">
+        DELETE FROM ff_evaluation_article WHERE id = #{id};
+    </delete>
+
+    <select id="cartList" resultType="com.fitnessfootball.fitnessfootball.dto.CartDto">
+        SELECT * FROM ff_cart order by created_at desc;
+    </select>
+
+
+
+    
+
+</mapper>
