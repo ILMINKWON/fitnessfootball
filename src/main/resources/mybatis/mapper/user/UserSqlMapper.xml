@@ -97,6 +97,21 @@
         SELECT COUNT(*) FROM ff_cart WHERE  user_id = #{user_id};
     </select>
 
+    <select id="productPrice" resultType="double">
+        SELECT price FROM ff_product fp WHERE id = #{id};
+    </select>
+
+    <!-- <delete id="deleteCart">
+        DELETE FROM ff_product WHERE id = #{id};
+    </delete> -->
+
+
+
+
+
+
+
+
     <insert id="createBoard">
         INSERT INTO ff_evaluation_article (user_id, title, read_count , content)
         VALUES(#{user_id}, #{title}, 0, #{content})

@@ -52,6 +52,8 @@ public interface UserSqlMapper {
     public int getTotalCart(int product_id);
     public int getMyCart(CartDto cartDto);
     public int myCartCount(int user_id);
+    public double productPrice(int id);
+    // public void deleteCart(int product_id,);
 
 
 

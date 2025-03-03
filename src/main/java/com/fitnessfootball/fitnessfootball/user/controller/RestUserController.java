@@ -61,6 +61,8 @@ public class RestUserController {
 
         userService.cart(cartDto);
 
+
+
         return restResponseDto;
 
 
@@ -137,6 +139,22 @@ public class RestUserController {
 
     }
 
+    @RequestMapping("productPrice")
+    public RestResponseDto productPrice(@RequestParam("productId")int product_id){
+        RestResponseDto restResponseDto = new RestResponseDto();
+
+        restResponseDto.setResult("success");
+
+
+        restResponseDto.add("productPrice", userService.productPrice(product_id));
+
+
+
+        return restResponseDto;
+
+
+    }
+
     @RequestMapping("updateCartSidebar")
     public RestResponseDto updateCartSidebar(HttpSession session){
         RestResponseDto restResponseDto = new RestResponseDto();
@@ -146,6 +164,25 @@ public class RestUserController {
         UserDto userDto = (UserDto) session.getAttribute("user");
 
         restResponseDto.add("cartCount", userService.myCartCount(userDto.getId()));
+
+
+
+        return restResponseDto;
+
+
+    }
+    @RequestMapping("deleteCart")
+    public RestResponseDto deleteCart(@RequestParam("productId")int product_id, HttpSession session, CartDto cartDto){
+        RestResponseDto restResponseDto = new RestResponseDto();
+
+        UserDto userDto = (UserDto) session.getAttribute("user");
+
+        restResponseDto.setResult("success");
+
+        cartDto.setUser_id(userDto.getId());
+
+        userService.unCart(cartDto);
+
 
 
 

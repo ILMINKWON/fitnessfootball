@@ -10,6 +10,13 @@
       .fs-0-8 {
         font-size: 0.8rem;  /* 0.8rem 크기 적용 */
       }
+      .fixed-bottom {
+        position: fixed;
+        bottom: 50rem;
+        left: 0;
+        width: 100%;
+        z-index: 1000; /* 다른 요소 위에 오도록 설정 */
+      }
     </style>
 
     
@@ -26,33 +33,104 @@
   </head>
   <body>
     <div th:replace="~{common/navi::topNavi}"></div>
-    <div class="container-fluid" th:each="list : ${cartList}">
-        <div class="row">
-            <!-- 리스트를 반복해서 카드 형식으로 출력 -->
-                <div class="col-md-4 mt-3 d-flex justify-content-center">
-                    <div class="card" style="width: 18rem;">
-                        <div class="card-body">
-                            <span th:text="${list.productDto.product_name}" style="font-weight: bold;"></span>
-                            <img th:src="|/uploadFiles/${list.productDto.image_link}|" alt="대표 이미지" class="img-fluid border mt-2 px-2" style="height: 5rem; border-radius: 5px;">
-                            <span class="mt-2 py-2 px-2 ms-2"> 수량 : <span th:text="${list.cartDto.quantity}"></span><span> 개 </span></span>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <a class="btn btn-light" style="font-size: 0.9rem; font-weight: 400;">구매하기</a>
-                                </div>
-                                <div class="col-7">
-                                    <a class="btn btn-danger">목록에서 제거</a>
-                                </div>
-                            </div>
-                        </div>
-                        
+    <div class="container-fluid">
+      <div class="row" th:each="list : ${cartList}">
+        <div class="col-md-4 mt-3 d-flex justify-content-center">
+          <div class="card product-card" style="width: 20rem;">
+            <div class="card-body">
+              <div class="row">
+                <div class="col p-0 text-center">
+                  <img th:src="|/uploadFiles/${list.productDto.image_link}|" alt="대표 이미지" class="border mt-1 px-2 ms-2" style="height: 5rem; border-radius: 5px;">
+                  <div class="row">
+                    <div class="col">
+                      <a type="button" class="btn btn-sm btn-danger mt-2" onclick="deleteCart(this)">목록에서 제거</a>
                     </div>
+                  </div>
                 </div>
+                <div class="col p-0 me-4">
+                  <span th:text="${list.productDto.product_name}" style="font-weight: bold; font-size: 0.9rem;"></span>
+                  <div class="row">
+                    <div class="col mt-2">
+                      <span> 수량 : </span>
+                      <button class="btn btn-sm btn-outline-secondary quantity-btn" onclick="updateQuantity(this, -1)">-</button>
+                      <span class="fw-bold quantity" th:text="${list.cartDto.quantity}"></span>
+                      <button class="btn btn-sm btn-outline-secondary quantity-btn" onclick="updateQuantity(this, 1)">+</button>
+                      <span> 개 </span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-2">
+                      <span class="apiData fw-bold"  th:data-base-price="${list.productDto.price}"></span>원
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" th:value="${list.productDto.id}" class="product-id">
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="row text-center">
+        <div class="col mx-5 mt-3 border border-3 py-2" style="border-radius: 20px; border-color: black !important;">
+          <span>
+            <span>총</span><span id="totalPrice" class="fw-bold ms-1  text-black">0</span>원
+          </span>
+        </div>
+      </div>
+      <div class="fixed-bottom bg-white border-top py-3">
+        <div class="container">
+          <div class="row">
+            <div class="col mb-1 ms-2">
+              <span class="fw-bold text-secondary  text-start" style="font-size: 0.9rem;">총 결제예상금액</span>
+            </div>
+            <div class="col">
+              <span id="totalPrice2" class="fw-bold text-danger text-end ms-5" style="font-size: 1.0rem;">0</span>원
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mb-1 ms-2">
+              <span class="fw-bold text-secondary text-start" style="font-size: 0.9rem;">배송비</span>
+            </div>
+            <div class="col">
+              <span id="deliveryfee" class="fw-bold text-danger ms-5" style="font-size: 1.0rem;">0</span>원
+            </div>
+          </div>
+          <div class="row mt-2 mb-3">
+            <div class="col mt-1">
+              <a id="purchaseButton" class="btn btn-lg text-white fw-bold" style="background-color:black; width: 100%; font-size: 1.0rem;">총 <span id="totalPriceBtn">0</span>원 구매하기</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="row mt-3 justify-content-center">
+        <div class="col-auto">
+            <a class="btn btn-primary" style="font-size: 0.9rem; font-weight: 400;">구매하기</a>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-danger">목록에서 제거</a>
+        </div>
+      </div> -->
+    </div>
+
+    <!-- 구매 오프캔버스-->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="purchaseOffcanvas" aria-labelledby="offcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasLabel">결제 정보</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <p><strong>총 결제 금액:</strong> <span id="offcanvasTotalPrice">0</span>원</p>
+        <p><strong>배송비:</strong> <span id="offcanvasDeliveryFee">0</span>원</p>
+        <hr>
+        <p><strong>최종 결제 금액:</strong> <span id="offcanvasFinalPrice">0</span>원</p>
+        <button class="btn btn-success w-100 mt-3">결제하기</button>
+      </div>
     </div>
 
 
+
   <!-- Footer 추가 -->
-  <footer class="border-top text-lg-start text-lg-start mt-5 mx-3" style="font-size: 0.8rem;">
+  <footer class="border-top text-lg-start text-lg-start mt-4 mx-3" style="font-size: 0.8rem;">
     <div class="container p-4">
       <!-- Footer Links -->
       <div class="row">
@@ -87,7 +165,6 @@
     <div class="text-center p-3 border-top mb-5 pb-5" style="font-size: small;">
       &copy; 2025 (주)풋볼코리아. All rights reserved.
     </div>
-    <div th:replace="~{common/bottomNav::userBottomNav}"></div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </footer>
@@ -97,6 +174,125 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const productElements = document.querySelectorAll(".product-card");
+        let totalPrice = 0;
+        let deliveryfee = 2500;
+        // let sumPrice = 0;
+        let totalPriceBtn = 0;
+
+        productElements.forEach(product => {
+          const productId = product.querySelector(".product-id").value;
+          const apiDataElement = product.querySelector(".apiData");
+
+          fetch(`/api/user/productPrice?productId=${productId}`)
+            .then(r => r.json())
+            .then(response => {
+              const productPrice = Number(response.data.productPrice);
+              const formattedPrice = productPrice.toLocaleString();
+              apiDataElement.innerText = formattedPrice;
+
+              totalPrice += productPrice;
+              totalPrice2 = totalPrice + deliveryfee;
+
+               // 총 가격 업데이트 (콤마 추가)
+              document.getElementById("totalPrice").innerText = totalPrice.toLocaleString();
+              document.getElementById("totalPrice2").innerText = totalPrice.toLocaleString();
+              document.getElementById("deliveryfee").innerText = deliveryfee.toLocaleString();
+              document.getElementById("totalPriceBtn").innerText = totalPrice2.toLocaleString();
+            })
+            .catch(error => console.error("Error fetching product price:", error));
+        });
+      });
+
+      function deleteCart(button){
+        let productCard = button.closest(".product-card");
+        let productId  = productCard.querySelector(".product-id").value;
+
+        fetch(`/api/user/deleteCart?productId=${productId}`,{
+          method:"DELETE",
+        })
+        .then(r => r.json())
+        .then(response =>{
+          if(response.data){
+            productCard.parentElement.remove();
+
+            updateTotalPrice();
+          }
+
+
+        })
+      }
+
+      function updateTotalPrice(){
+        let totalPrice = 0;
+        let deliveryfee = 2500;
+        let totalPriceBtn = 0;
+
+        document.querySelectorAll(".product-card").forEach(product => {
+            let priceText = product.querySelector(".apiData").innerText.replace(/,/g, '');
+            totalPrice += Number(priceText);
+        });
+
+        totalPrice2 = totalPrice + deliveryfee;
+
+        document.getElementById("totalPrice").innerText = totalPrice.toLocaleString();
+        document.getElementById("totalPrice2").innerText = totalPrice.toLocaleString();
+        document.getElementById("totalPriceBtn").innerText = totalPrice2.toLocaleString();
+      }
+
+    </script>
+    <script>
+      document.getElementById("purchaseButton").addEventListener("click", function () {
+        let totalPrice = document.getElementById("totalPrice").innerText;
+        let deliveryFee = document.getElementById("deliveryfee").innerText;
+        let finalPrice = document.getElementById("totalPriceBtn").innerText;
+    
+        document.getElementById("offcanvasTotalPrice").innerText = totalPrice;
+        document.getElementById("offcanvasDeliveryFee").innerText = deliveryFee;
+        document.getElementById("offcanvasFinalPrice").innerText = finalPrice;
+    
+        let offcanvas = new bootstrap.Offcanvas(document.getElementById("purchaseOffcanvas"));
+        offcanvas.show();
+      });
+    </script>
+
+<script>
+  function updateQuantity(button, change) {
+  let quantityElement = button.closest(".row").querySelector(".quantity");
+  let currentQuantity = parseInt(quantityElement.innerText);
+  let newQuantity = currentQuantity + change;
+
+  // 최소 수량 제한 (1개 이상)
+  if (newQuantity < 1) return;
+
+  // 새로운 수량을 화면에 업데이트
+  quantityElement.innerText = newQuantity;
+
+  // 개별 상품 가격 업데이트
+  let productCard = button.closest(".product-card");
+  let priceElement = productCard.querySelector(".apiData");
+  let basePrice = parseInt(priceElement.getAttribute("data-base-price")); // 원래 가격
+  let newTotalPrice = basePrice * newQuantity;
+
+  // 개별 상품 가격 업데이트
+  priceElement.innerText = newTotalPrice.toLocaleString();
+
+  // 서버에 수량 업데이트 요청
+  let productId = productCard.querySelector(".product-id").value;
+  fetch(`/api/user/productPrice?productId=${productId}`)
+  .then(r => r.json())
+  .then(response => {
+    const productPrice = Number(response.data.productPrice);
+    apiDataElement.innerText = productPrice.toLocaleString();
+    
+    // 원래 가격을 데이터 속성으로 저장
+    apiDataElement.setAttribute("data-base-price", productPrice);
+  })
+}
+</script>
     
   </body>
 

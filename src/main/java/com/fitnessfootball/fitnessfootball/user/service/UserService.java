@@ -28,9 +28,7 @@ public class UserService {
     private UserSqlMapper userSqlMapper;
 
     public void registerUser(UserDto userDto, List<Integer>InterestTagIdList){
-        System.out.println(userDto);
         userSqlMapper.createUser(userDto);
-        System.out.println(userDto);
         int lastUserPk =  userDto.getId();
 
         for(int interestId : InterestTagIdList){
@@ -198,8 +196,7 @@ public class UserService {
         result.put("boardDto", boardDto);
         result.put("userDto", userDto);
 
-        System.out.println(" >>> boardDto " + boardDto);
-        System.out.println(" >>> userDto " + userDto);
+        // System.out.println(" >>> boardDto " + boardDto);
 
         return result;
     }
@@ -242,6 +239,9 @@ public class UserService {
             ProductDto productDto = userSqlMapper.selectProductById(cartDto.getProduct_id());
             ProductImageDto productImageDto = userSqlMapper.selectProductImageById(cartDto.getProduct_id());
             cartDto.setUser_id(user_id);
+            System.out.println("cartDto >> " + cartDto);
+            System.out.println("cartDto.getQuantity() >> " + cartDto.getQuantity());
+
             
 
             map.put("cartDto", cartDto);
@@ -256,6 +256,14 @@ public class UserService {
 
         return result;
     }
+
+    public double productPrice(int product_id){
+        return userSqlMapper.productPrice(product_id);
+    }
+
+    // public void deleteCart(int product_id, int user_id){
+    //     userSqlMapper.deleteCart(product_id, user_id);
+    // }
  
 
 }

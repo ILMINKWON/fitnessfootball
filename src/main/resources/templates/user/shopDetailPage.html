@@ -46,77 +46,64 @@
           });
       }
 
-      function cart() { // 이름 변경
+      function cart() { 
+    const cartButton = document.getElementById("cart");
+    cartButton.disabled = true;  // 버튼 비활성화
+    const quantity = document.getElementById("quantity").value;
 
-        fetch(`/api/user/cart?product_id=${productId}`)
-          .then((r) => r.json())
-          .then((response) => {
+    fetch(`/api/user/cart?product_id=${productId}`)
+        .then((r) => r.json())
+        .then((response) => {
+          console.log(quantity)
             const cartMessage = document.getElementById("cartMessage");
-            
-            // const cartFormBox = document.getElementById("cartFormBox");
-            cartFormBox.innerHTML='';
-
-            // const cartForm = document.querySelector("#cartForm .cartFormWrapper").cloneNode(true);
-
-            
             isCart();
-            cartMessage.innerText="장바구니에 담겼습니다.";
+            cartMessage.innerText = "장바구니에 담겼습니다.";
             cartMessage.classList.remove("invisible");
-            // cartFormBox.appendChild(cartForm);
-            
-            setTimeout(() => {
-              cartMessage.classList.add("invisible");
-              // cartMessage.classList.add("invisibleTwo");
-            }, 2000);
-            
-          });
-      }
-
-      const cartIcon = document.getElementById("cart"); // 변수 이름 변경
-
-
-          function unCart(){
-          fetch(`/api/user/unCart?product_id=${productId}`)
-          .then((r) => r.json())
-          .then((response) => {
-            isCart();
-            const cartMessage = document.getElementById("cartMessage"); //id 값 가져오기.
-
-            const cartFormBox = document.getElementById("cartFormBox");
-            cartFormBox.innerHTML='';
-
-            // const cartForm = document.querySelector("#cartForm .uncartFormWrapper").cloneNode(true);
-            // cartFormBox.appendChild(cartForm); 
-
-            cartMessage.innerText="장바구니가 비워졌습니다.";
-            cartMessage.classList.remove("invisible");
-            // cartMessage.classList.remove("invisibleTwo");
 
             setTimeout(() => {
-              cartMessage.classList.add("invisible");
-              // cartMessage.classList.add("invisibleTwo");
+                cartMessage.classList.add("invisible");
             }, 2000);
-          
-          });
-      }
 
-        function isCart(){
-          fetch(`/api/user/isUserCart?product_id=${productId}`)
-          .then((r) => r.json())
-          .then((response) => {
+            cartButton.disabled = false;  // 요청 후 버튼 활성화
+        });
+}
+
+function unCart() {
+    const cartButton = document.getElementById("cart");
+    cartButton.disabled = true;  // 버튼 비활성화
+
+    fetch(`/api/user/unCart?product_id=${productId}`)
+        .then((r) => r.json())
+        .then((response) => {
+            isCart();
+            const cartMessage = document.getElementById("cartMessage");
+            cartMessage.innerText = "장바구니가 비워졌습니다.";
+            cartMessage.classList.remove("invisible");
+
+            setTimeout(() => {
+                cartMessage.classList.add("invisible");
+            }, 2000);
+
+            cartButton.disabled = false;  // 요청 후 버튼 활성화
+        });
+}
+
+function isCart(){
+    fetch(`/api/user/isUserCart?product_id=${productId}`)
+        .then((r) => r.json())
+        .then((response) => {
             const cart = document.getElementById("text");
-            if(response.data.isCart){
-              cart.innerText = "장 비우기";
-              cart.setAttribute("onclick", "unCart()");
-            }else{
-              
-              cart.setAttribute("onclick", "cart()");
-              cart.innerText = "우선담기";
+            const cartButton = document.getElementById("cart");
 
+            if(response.data.isCart) {
+                cart.innerText = "장 비우기";
+                cartButton.setAttribute("onclick", "unCart()");
+            } else {
+                cart.innerText = "우선담기";
+                cartButton.setAttribute("onclick", "cart()");
             }
-          });
-        }
-
+        });
+}
 
       // document.addEventListener("DOMContentLoaded", () => {
       //   const cartMessage = document.getElementById("cartMessage");
@@ -151,7 +138,7 @@
               <h5 class="card-title fw-bold mt-2" th:text="${productDto.product_name}" style="font-size: 0.9rem;"></h5>
               <p class="text-danger fw-bold" th:text="|${productDto.formattedPrice}원|" style="font-size: 1.1rem;"></p>
               <!-- 수량 입력 및 구매 버튼 -->
-              <form action="/student/medical/orderPage" method="get">
+              <form action="/fitnessfootball/orderPage" method="get" onsubmit="return validateForm()">
                 <div class="mb-3">
                   <label for="quantity" class="form-label">수량</label>
                   <div class="input-group">
@@ -161,12 +148,39 @@
                     <button type="button" class="btn btn-outline-secondary" onclick="incrementQuantity()">+</button>
                   </div>
                 </div>
-                <input type="hidden" name="id" value="${productDto.id}">
+                <div class="row" th:if="${productDto.id == 8}">
+                  <div class="col-md-6">
+                      <label for="sizeSelect" class="form-label fw-bold">사이즈 선택</label>
+                      <select id="sizeSelect" name="size" class="form-select shadow-sm p-2">
+                          <option selected>사이즈를 선택하세요</option>
+                          <option value="240">240</option>
+                          <option value="245">245</option>
+                          <option value="250">250</option>
+                          <option value="255">255</option>
+                          <option value="260">260</option>
+                          <option value="265">265</option>
+                          <option value="270">270</option>
+                          <option value="275">275</option>
+                          <option value="280">280</option>
+                          <option value="285">285</option>
+                      </select>
+                  </div>
+                </div>
+                <div class="row" th:if="${productDto.id == 8}">
+                  <div class="col-md-6">
+                      <label for="sizeSelect" class="form-label fw-bold">색상 선택</label>
+                      <select id="colorSelect" name="color" class="form-select shadow-sm p-2">
+                          <option selected>색상을 선택하세요</option>
+                          <option class="fw-bold" value="검정">검정</option>
+                      </select>
+                  </div>
+                </div>
+                <input type="hidden" name="id" th:value="${productDto.id}">
                 <span class="fw-bold" th:if="${session.user == null}">* 로그인 후 구매 가능합니다.
                   <a href="/fitnessfootball/loginPage" class="btn btn-sm btn-primary">로그인</a>
                 </span>
-                <button type="submit" class="btn btn-danger btn-md ms-3 mt-2" th:if="${session.user != null}"><i class="bi bi-wallet2 me-2"></i>바로 구매</button>
-                <a onclick="cart()" id="cart" type="button" class="btn btn-primary btn-md ms-4 mt-2" th:if="${session.user != null}">
+                <button type="submit" class="btn btn-danger btn-md ms-3 mt-3" th:if="${session.user != null}"><i class="bi bi-wallet2 me-2"></i>바로 구매</button>
+                <a onclick="cart()" id="cart" type="button" class="btn btn-primary btn-md ms-4 mt-3" th:if="${session.user != null}">
                   <span><i class="bi bi-cart-check-fill ms-2"></i></span>
                   <!-- <span id="cartCount"></span>  -->
                   <span id="text">우선담기</span>
@@ -175,6 +189,7 @@
                   <div id="cartFormBox"></div>
                 </div>
                 <div id="cartMessage" class="alert alert-success invisible mt-3" role="alert"></div>
+              </form>
                 <!-- <div class="d-none invisibleTwo" id="cartForm">
                   <div class="row mt-4">
                     <div class="col cartFormWrapper fs-0-8 fw-bold">
@@ -187,34 +202,17 @@
 
                   </div>
                 </div> -->
-              </form>
               
               <p class="border-top pt-3 pb-5" style="font-size: 0.9rem;" th:utext="${productdescription}"></p>
 
-              <script>
-               function incrementQuantity() {
-                  const input = document.getElementById('quantity');
-                  const max = parseInt(input.getAttribute('max'), 10); // max 값 읽기
-                  const currentValue = parseInt(input.value, 10); // 현재 값 읽기
-                  if (currentValue < max) {
-                    input.value = currentValue + 1;
-                  }
-                }
-
-                function decrementQuantity() {
-                  const input = document.getElementById('quantity');
-                  const min = parseInt(input.getAttribute('min'), 10); // min 값 읽기
-                  const currentValue = parseInt(input.value, 10); // 현재 값 읽기
-                  if (currentValue > min) {
-                    input.value = currentValue - 1;
-                  }
-                }
-              </script>
+             
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    
 
 
        <!-- Footer 추가 -->
@@ -262,5 +260,41 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+    <script>
+      function incrementQuantity() {
+         const input = document.getElementById('quantity');
+         const max = parseInt(input.getAttribute('max'), 10); // max 값 읽기
+         const currentValue = parseInt(input.value, 10); // 현재 값 읽기
+         if (currentValue < max) {
+           input.value = currentValue + 1;
+         }
+       }
+
+       function decrementQuantity() {
+         const input = document.getElementById('quantity');
+         const min = parseInt(input.getAttribute('min'), 10); // min 값 읽기
+         const currentValue = parseInt(input.value, 10); // 현재 값 읽기
+         if (currentValue > min) {
+           input.value = currentValue - 1;
+         }
+       }
+
+       function validateForm(){
+        const size = document.getElementById("sizeSelect").value;
+        const color = document.getElementById("colorSelect").value;
+
+        if(size === "사이즈를 선택하세요"){
+          alert("사이즈를 선택해주세요.");
+          return false;
+        }
+        if (color === "색상을 선택하세요") {
+          alert("색상을 선택해주세요.");
+          return false;
+        }
+
+        return true;
+
+       }
+     </script>
   </body>
 </html>

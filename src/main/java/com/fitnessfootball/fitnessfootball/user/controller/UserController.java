@@ -279,8 +279,33 @@ public class UserController {
         model.addAttribute("product", userService.selectProduct(userDto));
 
         return "/user/shopPage";
+        
+    }
+
+
+    @RequestMapping("orderPage")
+    public String orderPage(@RequestParam("id")int id, @RequestParam(name = "count") int count, @RequestParam(name = "size", required = false) String size, @RequestParam(name = "color", required = false) String color, Model model, HttpSession session){
+
+        UserDto userDto = (UserDto) session.getAttribute("user");
+
+
+        model.addAttribute("productDto", userService.selectProductById(id));
+        model.addAttribute("productImage", userService.selectProductImageById(id));
+        model.addAttribute("size", size);
+        model.addAttribute("color", color);
+        model.addAttribute("count", count);
+        model.addAttribute("userDto", userDto);
+
+
+        return "/user/orderPage";
+        
     }
     
+
+
+
+
+
 
     //게시판 페이지
 
