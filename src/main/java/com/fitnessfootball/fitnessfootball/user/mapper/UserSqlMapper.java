@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.fitnessfootball.fitnessfootball.dto.AddressDto;
 import com.fitnessfootball.fitnessfootball.dto.BoardDto;
 import com.fitnessfootball.fitnessfootball.dto.CartDto;
 import com.fitnessfootball.fitnessfootball.dto.GoodDto;
@@ -76,5 +77,9 @@ public interface UserSqlMapper {
     public void boardDelete(int id);
 
     public List<CartDto> cartList();
+
+    public void insertAddress(AddressDto addressDto);
+
+    public List<AddressDto> selectAddress ();
 
 }

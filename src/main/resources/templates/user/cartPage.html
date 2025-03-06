@@ -110,23 +110,32 @@
             <a class="btn btn-danger">목록에서 제거</a>
         </div>
       </div> -->
-    </div>
 
     <!-- 구매 오프캔버스-->
+  <form action="/fitnessfootball/orderPage">
+    <div th:each="item : ${cartList}">
+      <input type="hidden" name="id[]" th:value="${item.productDto.id}" class="product-id">
+      <input type="hidden" name="count[]" class="hidden-count" th:value="${item.cartDto.quantity}">
+      <span class="quantity" th:text="${item.cartDto.quantity}"></span>
+        <button type="button" onclick="updateQuantity(this, 1)">+</button>
+        <button type="button" onclick="updateQuantity(this, -1)">-</button>
+    </div>
+    <!-- <input type="hidden" name="id[]" th:value="456"> -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="purchaseOffcanvas" aria-labelledby="offcanvasLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasLabel">결제 정보</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body">
-        <p><strong>총 결제 금액:</strong> <span id="offcanvasTotalPrice">0</span>원</p>
-        <p><strong>배송비:</strong> <span id="offcanvasDeliveryFee">0</span>원</p>
+        <p><strong>총 결제 금액:</strong> <span class="fw-bold" id="offcanvasTotalPrice">0</span>원</p>
+        <p><strong>배송비:</strong> <span class="fw-bold" id="offcanvasDeliveryFee">0</span>원</p>
         <hr>
-        <p><strong>최종 결제 금액:</strong> <span id="offcanvasFinalPrice">0</span>원</p>
-        <button class="btn btn-success w-100 mt-3">결제하기</button>
+        <p><strong>최종 결제 금액:</strong> <span class="fw-bold" id="offcanvasFinalPrice">0</span>원</p>
+        <button type="submit" class="btn btn-secondary fw-bold w-100 mt-3">결제하기</button>
       </div>
     </div>
-
+  </form>
+</div>
 
 
   <!-- Footer 추가 -->
@@ -177,35 +186,34 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const productElements = document.querySelectorAll(".product-card");
-        let totalPrice = 0;
-        let deliveryfee = 2500;
-        // let sumPrice = 0;
-        let totalPriceBtn = 0;
+    const productElements = document.querySelectorAll(".product-card");
+    let totalPrice = 0;
+    let deliveryfee = 2500; // 기본 배송비 설정
+    let totalPrice2 = 0;
 
-        productElements.forEach(product => {
-          const productId = product.querySelector(".product-id").value;
-          const apiDataElement = product.querySelector(".apiData");
+    productElements.forEach(product => {
+        const productId = product.querySelector(".product-id").value;
+        const apiDataElement = product.querySelector(".apiData");
 
-          fetch(`/api/user/productPrice?productId=${productId}`)
+        fetch(`/api/user/productPrice?productId=${productId}`)
             .then(r => r.json())
             .then(response => {
-              const productPrice = Number(response.data.productPrice);
-              const formattedPrice = productPrice.toLocaleString();
-              apiDataElement.innerText = formattedPrice;
+                const productPrice = Number(response.data.productPrice);
+                const formattedPrice = productPrice.toLocaleString();
+                apiDataElement.innerText = formattedPrice;
 
-              totalPrice += productPrice;
-              totalPrice2 = totalPrice + deliveryfee;
+                totalPrice += productPrice;
+                totalPrice2 = totalPrice + deliveryfee; // 총 결제 예상금액 + 배송비 합산
 
-               // 총 가격 업데이트 (콤마 추가)
-              document.getElementById("totalPrice").innerText = totalPrice.toLocaleString();
-              document.getElementById("totalPrice2").innerText = totalPrice.toLocaleString();
-              document.getElementById("deliveryfee").innerText = deliveryfee.toLocaleString();
-              document.getElementById("totalPriceBtn").innerText = totalPrice2.toLocaleString();
+                // UI 업데이트
+                document.getElementById("totalPrice").innerText = totalPrice.toLocaleString();
+                document.getElementById("totalPrice2").innerText = totalPrice2.toLocaleString(); 
+                document.getElementById("deliveryfee").innerText = deliveryfee.toLocaleString();
+                document.getElementById("totalPriceBtn").innerText = totalPrice2.toLocaleString(); // 총 구매 금액 버튼 업데이트
             })
             .catch(error => console.error("Error fetching product price:", error));
-        });
-      });
+    });
+});
 
       function deleteCart(button){
         let productCard = button.closest(".product-card");
@@ -226,22 +234,26 @@
         })
       }
 
-      function updateTotalPrice(){
-        let totalPrice = 0;
-        let deliveryfee = 2500;
-        let totalPriceBtn = 0;
+      function updateTotalPrice() {
+    let totalPrice = 0;
 
-        document.querySelectorAll(".product-card").forEach(product => {
-            let priceText = product.querySelector(".apiData").innerText.replace(/,/g, '');
-            totalPrice += Number(priceText);
-        });
+    // 장바구니에 있는 모든 상품의 가격 합산
+    document.querySelectorAll(".apiData").forEach(priceElement => {
+        totalPrice += parseInt(priceElement.innerText.replace(/,/g, "")); // 쉼표 제거 후 숫자로 변환
+    });
 
-        totalPrice2 = totalPrice + deliveryfee;
+    // 배송비 계산
+    let deliveryFee = 2500;
 
-        document.getElementById("totalPrice").innerText = totalPrice.toLocaleString();
-        document.getElementById("totalPrice2").innerText = totalPrice.toLocaleString();
-        document.getElementById("totalPriceBtn").innerText = totalPrice2.toLocaleString();
-      }
+    // 총 결제 금액 계산
+    let finalTotalPrice = totalPrice + deliveryFee;
+
+    // UI 업데이트
+    document.getElementById("totalPrice").innerText = totalPrice.toLocaleString();
+    document.getElementById("totalPrice2").innerText = finalTotalPrice.toLocaleString();
+    document.getElementById("deliveryfee").innerText = deliveryFee.toLocaleString();
+    document.getElementById("totalPriceBtn").innerText = finalTotalPrice.toLocaleString(); // 수정된 부분
+}
 
     </script>
     <script>
@@ -260,7 +272,7 @@
     </script>
 
 <script>
-  function updateQuantity(button, change) {
+ function updateQuantity(button, change) {
   let quantityElement = button.closest(".row").querySelector(".quantity");
   let currentQuantity = parseInt(quantityElement.innerText);
   let newQuantity = currentQuantity + change;
@@ -280,18 +292,30 @@
   // 개별 상품 가격 업데이트
   priceElement.innerText = newTotalPrice.toLocaleString();
 
+    // hidden-count 값도 업데이트
+    let hiddenCountInput = productCard.querySelector(".hidden-count");
+  if (hiddenCountInput) {
+    hiddenCountInput.value = newQuantity; // 수량 변경 시 해당 hidden input 값도 수정
+  }
+
+  
+
   // 서버에 수량 업데이트 요청
   let productId = productCard.querySelector(".product-id").value;
   fetch(`/api/user/productPrice?productId=${productId}`)
   .then(r => r.json())
   .then(response => {
+    updateTotalPrice();
     const productPrice = Number(response.data.productPrice);
     apiDataElement.innerText = productPrice.toLocaleString();
     
     // 원래 가격을 데이터 속성으로 저장
     apiDataElement.setAttribute("data-base-price", productPrice);
-  })
+  });
+
 }
+
+
 </script>
     
   </body>

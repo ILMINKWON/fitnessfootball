@@ -4,7 +4,9 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fitnessfootball.fitnessfootball.dto.BoardDto;
-import com.fitnessfootball.fitnessfootball.dto.CartDto;
 import com.fitnessfootball.fitnessfootball.dto.ManagerDto;
 import com.fitnessfootball.fitnessfootball.dto.ProductDto;
 import com.fitnessfootball.fitnessfootball.dto.ProductImageDto;
@@ -284,22 +285,41 @@ public class UserController {
 
 
     @RequestMapping("orderPage")
-    public String orderPage(@RequestParam("id")int id, @RequestParam(name = "count") int count, @RequestParam(name = "size", required = false) String size, @RequestParam(name = "color", required = false) String color, Model model, HttpSession session){
+    public String orderPage(@RequestParam(value = "id[]") List<Integer> productIds, @RequestParam(name = "count[]") List<Integer> count, @RequestParam(name = "size", required = false) String size, @RequestParam(name = "color", required = false) String color, Model model, HttpSession session){
+        System.out.println("받은 수량 리스트: " + count); // 디버깅용 로그
 
         UserDto userDto = (UserDto) session.getAttribute("user");
-
-
-        model.addAttribute("productDto", userService.selectProductById(id));
-        model.addAttribute("productImage", userService.selectProductImageById(id));
-        model.addAttribute("size", size);
-        model.addAttribute("color", color);
-        model.addAttribute("count", count);
+        List<Map<String,Object>> list = new ArrayList<>();
+        for(int i=0; i< productIds.size(); i++){
+            Map<String,Object> map = new HashMap<>();
+            System.out.println(productIds.get(i)+"수량"+ count.get(i));
+            ProductDto productDto = userService.selectProductById(productIds.get(i));
+            ProductImageDto productImage = userService.selectProductImageById(productIds.get(i));
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+count);
+            map.put("productDto", productDto);
+            map.put("productImage", productImage);
+            int totalPrice = productDto.getPrice()*count.get(i);
+            map.put("totalPrice",totalPrice);
+            map.put("size", size);
+            map.put("color", color);
+            map.put("count", count);
+            list.add(map);
+        }
+        model.addAttribute("list", list);
         model.addAttribute("userDto", userDto);
 
 
         return "/user/orderPage";
         
     }
+    // @RequestMapping("addressProcess")
+    // public String addressProcess(AddressDto addressDto){
+
+    //     userService.insertAddress(addressDto);
+
+    //     return "redirect:/fitnessfootball/orderPage";
+        
+    // }
     
 
 

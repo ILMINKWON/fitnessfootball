@@ -105,6 +105,15 @@
         DELETE FROM ff_product WHERE id = #{id};
     </delete> -->
 
+    <insert id="insertAddress">
+        INSERT INTO address (order_id, user_name, address, phone_number, memo)
+        VALUES(#{order_id}, #{user_name}, #{address}, #{phone_number}, #{memo})
+    </insert>
+
+    <select id="selectAddress" resultType="com.fitnessfootball.fitnessfootball.dto.AddressDto">
+        SELECT * FROM address ORDER BY id DESC;
+    </select>
+
 
 
 

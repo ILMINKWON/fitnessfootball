@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 import org.springframework.stereotype.Service;
 
+import com.fitnessfootball.fitnessfootball.dto.AddressDto;
 import com.fitnessfootball.fitnessfootball.dto.BoardDto;
 import com.fitnessfootball.fitnessfootball.dto.CartDto;
 import com.fitnessfootball.fitnessfootball.dto.GoodDto;
@@ -185,6 +187,12 @@ public class UserService {
 
     }
 
+    public void insertAddress(AddressDto addressDto){
+
+        userSqlMapper.insertAddress(addressDto);
+
+    }
+
     public Map<String, Object> selectArticleId(int id){
 
         Map<String, Object> result = new HashMap<>();
@@ -200,6 +208,12 @@ public class UserService {
 
         return result;
     }
+
+    // public List<Map<String,Object>> selectAddress(AddressDto addressDto){
+
+    //     Map<String, Object> result = new HashMap<>();
+        
+    // }
 
     //추천
 

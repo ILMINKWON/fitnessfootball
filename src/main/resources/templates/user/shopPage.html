@@ -22,7 +22,14 @@
 
     <!-- 메인 페이지 내용 -->
     <div class="row mt-3 ms-2 me-2">
-      <div class="col-6 p-3 text-center" th:each="list : ${product}">
+      <div class="col-6 p-3 text-center wrapper" th:each="list : ${product}">
+        <input type="hidden" class="id" th:value="${list.productDto.id}" /> <!-- 추가된 부분 -->
+        <p th:if="${list.boolean > 0}">
+          <i onclick="uncart(event)" id="uncart" class="bi bi-star-fill me-5 pe-5"></i>
+        </p>
+        <p th:unless="${list.boolean > 0}">
+          <i onclick="Cart(event)" id="cart" class="bi bi-star me-5 pe-5"></i>
+        </p>
         <a class="text-decoration-none text-black" th:href="@{/fitnessfootball/shopDetailPage(id=${list.productDto.id})}">
           <div class="rounded p-2">
             <!-- 상품 이미지 -->
@@ -108,6 +115,71 @@
         product.style.color = "black";
         product.style.fontWeight = "bold";
       });
+
+      function Cart(event) {
+      const target = event.target; // 클릭된 요소 (별 아이콘)
+      const wrapper = target.closest(".wrapper"); // 가장 가까운 .wrapper 찾기
+      if (!wrapper) return console.error("Wrapper not found");
+
+      const idElement = wrapper.querySelector(".id"); 
+      if (!idElement) return console.error("ID element not found");
+
+      const id = idElement.value;
+      
+      fetch(`/api/user/cart?product_id=${id}`)
+        .then((r) => r.json())
+        .then((response) => {
+          console.log("Added to cart:", response);target.classList.remove("bi-star");
+          target.classList.add("bi-star-fill");
+          target.setAttribute("onclick", "uncart(event)"); // 클릭 이벤트 변경
+        });
+    }
+
+    function uncart(event) {
+      const target = event.target; // 클릭된 요소 (별 아이콘)
+      const wrapper = target.closest(".wrapper");
+      if (!wrapper) return console.error("Wrapper not found");
+
+      const idElement = wrapper.querySelector(".id");
+      if (!idElement) return console.error("ID element not found");
+
+      const id = idElement.value;
+
+      fetch(`/api/user/unCart?product_id=${id}`)
+        .then((r) => r.json())
+        .then((response) => {
+          const cart = target; 
+          cart.classList.remove("bi-star-fill");
+          cart.classList.add("bi-star");
+          cart.setAttribute("onclick", "Cart(event)"); // 클릭 이벤트 변경
+        });
+    }
+
+    function isCart(event) {
+      const target = event.target;
+      const wrapper = target.closest(".wrapper");
+      if (!wrapper) return console.error("Wrapper not found");
+
+      const idElement = wrapper.querySelector(".id");
+      if (!idElement) return console.error("ID element not found");
+
+      const id = idElement.value;
+
+      fetch(`/api/user/isUserCart?product_id=${id}`)
+        .then((r) => r.json())
+        .then((response) => {
+          const cart = target;
+          if (response.data.isCart) {
+            cart.classList.remove("bi-star");
+            cart.classList.add("bi-star-fill");
+            cart.setAttribute("onclick", "uncart(event)");
+          } else {
+            cart.classList.remove("bi-star-fill");
+            cart.classList.add("bi-star");
+            cart.setAttribute("onclick", "Cart(event)");
+          }
+        });
+    }
   </script>
     
   </body>

@@ -21,6 +21,7 @@
     />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   </head>
   <body>
 
@@ -28,7 +29,7 @@
     <div th:replace="~{common/navi::topNavi}"></div>
     <!-- 메인 컨테이너 -->
     <div class="container justify-content-center mt-3">
-      <div class="row">
+      <div class="row" th:each="product:${list}">
         <div class="col mx-2">
             <div class="row">
                 <div class="col fw-bold ms-2" style="font-size: large;">
@@ -37,27 +38,27 @@
             </div>
             <div class="row border-bottom border-5 pb-3">
                 <div class="col-5 ms-2 mt-3 border border" style="border-radius: 5px;">
-                    <img th:src="|/uploadFiles/${productImage.location}|" class="card-img-top" alt="상세 이미지">
+                    <img th:if="${product.productImage != null and product.productImage.location != null}" th:src="|/uploadFiles/${product.productImage.location}|" class="card-img-top" alt="상세 이미지">
                 </div>
                 <div class="col mt-3">
-                    <span class="fw-bold" th:text="${productDto.product_name}" style="font-size: 1.0rem;"></span>
+                    <span class="fw-bold" th:text="${product.productDto.product_name}" style="font-size: 1.0rem;"></span>
                     <div class="row">
                         <div class="col">
                             <span class="text-secondary fw-bold" style="font-size: 0.8rem;">
-                                수량 : <span th:text="${count}"></span>개
+                                수량 : <span th:text="${product.count}"></span>개
                             </span>
                         </div>
                     </div>
-                    <div class="row" th:if="${size != null}">
+                    <div class="row" th:if="${product.size != null}">
                         <div class="col">
                             <span class="text-secondary fw-bold" style="font-size: 0.8rem;">
-                                사이즈 : <span th:text="${size}"></span> / 색상 : <span th:text="${color}"></span>
+                                사이즈 : <span th:text="${product.size}"></span> / 색상 : <span th:text="${product.color}"></span>
                             </span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col fw-bold mt-1">
-                            <span th:text="${#numbers.formatInteger(productDto.price * count, 3, 'COMMA') + '원'}"></span>
+                          <span th:text="${#numbers.formatInteger((product.totalPrice != null ? product.totalPrice : 0), 3, 'COMMA') + '원'}"></span>
                         </div>
                     </div>
                 </div>
@@ -70,7 +71,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col mt-3 ms-2">
+        <div class="col border-bottom border-5 pb-3 mt-3 mx-2">
           <span class="fw-bold" th:text="${userDto.name}"></span>
           <div class="row">
             <div class="col">
@@ -84,7 +85,77 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col fw-bold ms-2 mt-3" style="font-size: large;">
+          배송 정보
+        </div>
+        <div class="col text-end me-2 mt-3">
+          <button id="saveAddressButton" class="btn btn-outline-primary">배송지 정보 수정</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <span class="ms-1">(기본정보)</span>
+          <div class="row">
+            <div class="col">
+              <span id="addressname"></span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <span id="addressPhone"></span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <span id="address"></span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <span id="addressMemo"></span>
+            </div>
+          </div>
+        </div>
+       
+      </div>
     </div>
+
+    <!-- 배송지 입력 모달 -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addressModalLabel">배송지 입력</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addressForm">
+          <div class="mb-3">
+            <label for="recipientName" class="form-label">받는 사람</label>
+            <input type="text" name="user_name" class="form-control" id="recipientName" required>
+          </div>
+          <div class="mb-3">
+            <label for="phoneNumber" class="form-label">연락처</label>
+            <input type="text" name="phone_number" class="form-control" id="phoneNumber" required>
+          </div>
+          <div class="mb-3">
+            <label for="address" class="form-label">주소</label>
+            <div class="input-group">
+              <input type="text" name="address" class="form-control" id="address" placeholder="주소를 입력하세요" readonly required>
+              <button type="button" class="btn btn-outline-secondary" onclick="searchAddress()">주소 찾기</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="deliveryMemo" class="form-label">기본 배송 메모</label>
+            <textarea class="form-control" name="memo" id="deliveryMemo"  placeholder="ex:문 앞에 배송 바랍니다." rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">저장</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
     
 
@@ -134,5 +205,89 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+    <script>
+       document.getElementById("addressForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // 폼 기본 제출 방지
+
+    let recipientName = document.getElementById("recipientName").value;
+    let phoneNumber = document.getElementById("phoneNumber").value;
+    let address = document.getElementById("address").value;
+    let deliveryMemo = document.getElementById("deliveryMemo").value;
+
+    if (!recipientName || !phoneNumber || !address) {
+      alert("필수 정보를 입력해주세요.");
+      return;
+    }
+
+    // AJAX 요청 데이터
+    let formData = {
+      user_name: recipientName,
+      phone_number: phoneNumber,
+      address: address,
+      memo: deliveryMemo
+    };
+
+    // AJAX 요청
+    fetch("/api/user/addressProcess", {
+      method: "POST",  // HTTP 메서드
+      headers: {
+        "Content-Type": "application/json", // JSON 형식으로 전송
+      },
+      body: JSON.stringify(formData), // 데이터를 JSON 문자열로 변환 후 전송
+    })
+    .then(r => r.json())  // 응답을 JSON으로 변환
+    .then(response => {
+      if (response.data) { // 서버가 성공적으로 저장했을 경우
+        alert("배송 정보가 저장되었습니다!");
+        let addressModal = bootstrap.Modal.getInstance(document.getElementById("addressModal"));
+        addressModal.hide();
+      } else {
+        alert("배송 정보 저장에 실패했습니다.");
+      }
+    })
+    .catch(error => {
+      console.error("에러 발생:", error);
+      alert("오류가 발생했습니다.");
+    });
+  });
+
+
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("saveAddressButton").addEventListener("click", function () {
+          let addressModal = new bootstrap.Modal(document.getElementById("addressModal"));
+          addressModal.show();
+        });
+      });
+    
+      function searchAddress() {
+    new daum.Postcode({
+      oncomplete: function(data) {
+        // 사용자가 주소를 선택하면, 해당 주소를 입력창에 자동 입력
+        document.getElementById("address").value = data.address;
+      }
+    }).open();
+  }
+    
+      document.getElementById("addressForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+    
+        let recipientName = document.getElementById("recipientName").value;
+        let phoneNumber = document.getElementById("phoneNumber").value;
+        let address = document.getElementById("address").value;
+        let deliveryMemo = document.getElementById("deliveryMemo").value;
+    
+        if (!recipientName || !phoneNumber || !address) {
+          alert("필수 정보를 입력해주세요.");
+          return;
+        }
+    
+        // 저장된 정보를 화면에 표시하는 기능 추가 가능
+        alert("배송 정보가 저장되었습니다!");
+    
+        let addressModal = bootstrap.Modal.getInstance(document.getElementById("addressModal"));
+        addressModal.hide();
+      });
+    </script>
   </body>
 </html>

@@ -144,7 +144,7 @@ function isCart(){
                   <div class="input-group">
                     <!-- 기존 수량 입력을 대체한 버튼과 입력 필드 -->
                     <button type="button" class="btn btn-outline-secondary" onclick="decrementQuantity()">-</button>
-                    <input type="number" id="quantity" name="count" class="form-control text-center" value="1" min="1" th:max="${productDto.inventory}">
+                    <input type="number" id="quantity" name="count[]" class="form-control text-center" value="1" min="1" th:max="${productDto.inventory}">
                     <button type="button" class="btn btn-outline-secondary" onclick="incrementQuantity()">+</button>
                   </div>
                 </div>
@@ -175,7 +175,7 @@ function isCart(){
                       </select>
                   </div>
                 </div>
-                <input type="hidden" name="id" th:value="${productDto.id}">
+                <input type="hidden" name="id[]" th:value="${productDto.id}">
                 <span class="fw-bold" th:if="${session.user == null}">* 로그인 후 구매 가능합니다.
                   <a href="/fitnessfootball/loginPage" class="btn btn-sm btn-primary">로그인</a>
                 </span>

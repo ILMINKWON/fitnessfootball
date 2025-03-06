@@ -112,10 +112,10 @@ function isCart(event) {
     <div class="row mt-3 ms-2 me-2">
       <div class="col-6 p-3 text-center wrapper" th:each="list, iterStat : ${product}" th:if="${iterStat.index < 4}">
         <p th:if="${list.boolean > 0}">
-          <i onclick="uncart(event)" id="uncart" class="bi bi-star-fill me-5 pe-5"></i>
+          <!-- <i onclick="uncart(event)" id="uncart" class="bi bi-star-fill me-5 pe-5"></i> -->
         </p>
         <p th:unless="${list.boolean > 0}">
-          <i onclick="Cart(event)" id="cart" class="bi bi-star me-5 pe-5"></i>
+          <!-- <i onclick="Cart(event)" id="cart" class="bi bi-star me-5 pe-5"></i> -->
         </p>
           <a class="text-decoration-none text-black"  th:href="@{/fitnessfootball/shopDetailPage(id=${list.productDto.id})}">
           <div class="p-2">

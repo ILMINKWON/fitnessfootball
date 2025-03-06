@@ -1,10 +1,12 @@
 package com.fitnessfootball.fitnessfootball.user.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fitnessfootball.fitnessfootball.dto.AddressDto;
 import com.fitnessfootball.fitnessfootball.dto.CartDto;
 import com.fitnessfootball.fitnessfootball.dto.GoodDto;
 import com.fitnessfootball.fitnessfootball.dto.RestResponseDto;
@@ -181,6 +183,8 @@ public class RestUserController {
 
         cartDto.setUser_id(userDto.getId());
 
+        cartDto.setProduct_id(product_id);
+
         userService.unCart(cartDto);
 
 
@@ -190,6 +194,26 @@ public class RestUserController {
 
 
     }
+
+    @RequestMapping("addressProcess")
+    public RestResponseDto addressProcess(@RequestBody AddressDto addressDto){
+        RestResponseDto restResponseDto = new RestResponseDto();
+
+        restResponseDto.setResult("success");
+
+        userService.insertAddress(addressDto);
+
+        System.out.println(addressDto);
+
+
+
+
+        return restResponseDto;
+
+
+    }
+
+
 
 
 
