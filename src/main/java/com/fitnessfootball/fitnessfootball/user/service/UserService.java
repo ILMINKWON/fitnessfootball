@@ -193,6 +193,13 @@ public class UserService {
 
     }
 
+    //주소 불러오기
+    public List<AddressDto> selectAddress (){
+        
+        return userSqlMapper.selectAddress();
+
+    }
+
     public Map<String, Object> selectArticleId(int id){
 
         Map<String, Object> result = new HashMap<>();

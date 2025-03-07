@@ -1,5 +1,7 @@
 package com.fitnessfootball.fitnessfootball.user.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -212,6 +214,23 @@ public class RestUserController {
 
 
     }
+
+    //주소 불러오기
+    @RequestMapping("selectAddress")
+    public RestResponseDto selectAddress(){
+        RestResponseDto restResponseDto = new RestResponseDto();
+
+        restResponseDto.setResult("success");
+
+        List<AddressDto> addressDto = userService.selectAddress();
+        restResponseDto.add("addressDto", addressDto);
+
+        return restResponseDto;
+
+
+    }
+
+    
 
 
 

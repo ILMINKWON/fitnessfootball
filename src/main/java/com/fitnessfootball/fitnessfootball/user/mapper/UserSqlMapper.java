@@ -3,6 +3,7 @@ package com.fitnessfootball.fitnessfootball.user.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 
 import com.fitnessfootball.fitnessfootball.dto.AddressDto;
 import com.fitnessfootball.fitnessfootball.dto.BoardDto;
@@ -80,6 +81,9 @@ public interface UserSqlMapper {
 
     public void insertAddress(AddressDto addressDto);
 
+    //주소 불러오기
     public List<AddressDto> selectAddress ();
+
+
 
 }

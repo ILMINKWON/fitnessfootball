@@ -295,7 +295,7 @@ public class UserController {
             System.out.println(productIds.get(i)+"수량"+ count.get(i));
             ProductDto productDto = userService.selectProductById(productIds.get(i));
             ProductImageDto productImage = userService.selectProductImageById(productIds.get(i));
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+count);
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+count.get(i));
             map.put("productDto", productDto);
             map.put("productImage", productImage);
             int totalPrice = productDto.getPrice()*count.get(i);
