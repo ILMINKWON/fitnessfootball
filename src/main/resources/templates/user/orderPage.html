@@ -36,7 +36,7 @@
     </div>
       <div class="row" th:each="product:${list}">
         <div class="col mx-2">
-            <div class="row border-bottom border-5 pb-3">
+            <div class="row pb-3">
                 <div class="col-5 ms-2 mt-3 border border" style="border-radius: 5px;">
                     <img th:if="${product.productImage != null and product.productImage.location != null}" th:src="|/uploadFiles/${product.productImage.location}|" class="card-img-top" alt="상세 이미지">
                 </div>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="row">
                         <div class="col fw-bold mt-1">
-                          <span th:text="${#numbers.formatInteger((product.totalPrice != null ? product.totalPrice : 0), 3, 'COMMA') + '원'}"></span>
+                          <span id="price" th:text="${#numbers.formatInteger((product.totalPrice != null ? product.totalPrice : 0), 3, 'COMMA') + '원'}"></span>
                         </div>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col fw-bold ms-2 mt-3" style="font-size: large;">
+        <div class="col border-top border-5 pt-3 fw-bold mx-2 ms-2 mt-3" style="font-size: large;">
           주문자 정보
         </div>
       </div>
@@ -89,32 +89,46 @@
         <div class="col fw-bold ms-2 mt-3" style="font-size: large;">
           배송 정보
         </div>
-        <div class="col text-end me-2 mt-3">
-          <button id="saveAddressButton" class="btn btn-sm btn-outline-primary">배송지 정보 추가</button>
-          <button id="changeAddressModal" class="btn btn-sm btn-outline-primary mt-2">배송지 정보 변경</button>
+        <div class="col m-0 mt-3">
+          <button id="saveAddressButton" class="btn btn-sm btn-outline-primary">배송지 추가</button>
+        </div>
+        <div class="col me-3 mt-3">
+          <span><button id="changeAddressModal" class="btn btn-sm btn-outline-primary">배송지 변경</button> </span>
         </div>
       </div>
       <div class="row">
-        <div class="col">
-          <span class="ms-1">(기본정보)</span>
+        <div class="col border-bottom border-5 pb-3 mx-1 mt-4">
           <div class="row">
             <div class="col">
-              <span class="ms-1 fw-bold" id="addressname"></span>
+              <span class="ms-1 fw-bold" id="addressname" style="font-size: 0.9rem;"></span>
             </div>
           </div>
           <div class="row">
             <div class="col">
-              <span class="ms-1" id="addressPhone" style="color: gray;"></span>
+              <span class="ms-1" id="addressPhone" style="color: gray; font-size: 0.9rem;"></span>
             </div>
           </div>
           <div class="row">
             <div class="col">
-              <span class="ms-1 fw-bold" id="address"></span>
+              <span class="ms-1 fw-bold" id="address" style="font-size: 0.9rem;"></span>
             </div>
           </div>
           <div class="row">
             <div class="col">
-              <span class="ms-1 fw-bold" id="addressMemo" style="color: gray;"></span>
+              <span class="ms-1 fw-bolder" id="addressMemo" style="color: gray; font-size: 0.9rem;"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col border-bottom border-5 pb-3 mt-3 mx-2">
+          <span class="fw-bold" style="font-size: large;">최종 결제 금액</span>
+          <div class="row mt-3">
+            <div class="col">
+              <span>상품가격</span> 
+            </div>
+            <div class="col">
+              <span th:text="${#numbers.formatInteger(totalPriceSum, 3, 'COMMA') + '원'}"></span> 
             </div>
           </div>
         </div>
@@ -330,7 +344,7 @@
             document.getElementById("address").innerHTML = selectedAddress.address;
             document.getElementById("addressMemo").innerHTML = `기본 배송 메모 : ${selectedAddress.memo ? selectedAddress.memo : "없음"}`;
 
-            let changeAddressModal = bootstrap.Modal.getInstance(document.getElementById("changeAddressModal"));
+            let changeAddressModal = bootstrap.Modal.getInstance(document.getElementById("changeModal"));
             changeAddressModal.hide();
           });
         });

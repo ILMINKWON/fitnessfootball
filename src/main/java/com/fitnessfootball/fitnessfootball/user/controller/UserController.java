@@ -286,19 +286,20 @@ public class UserController {
 
     @RequestMapping("orderPage")
     public String orderPage(@RequestParam(value = "id[]") List<Integer> productIds, @RequestParam(name = "count[]") List<Integer> count, @RequestParam(name = "size", required = false) String size, @RequestParam(name = "color", required = false) String color, Model model, HttpSession session){
-        System.out.println("받은 수량 리스트: " + count); // 디버깅용 로그
 
         UserDto userDto = (UserDto) session.getAttribute("user");
         List<Map<String,Object>> list = new ArrayList<>();
+        int totalPriceSum = 0; // 총 금액을 저장할 변수
+
         for(int i=0; i< productIds.size(); i++){
             Map<String,Object> map = new HashMap<>();
-            System.out.println(productIds.get(i)+"수량"+ count.get(i));
             ProductDto productDto = userService.selectProductById(productIds.get(i));
             ProductImageDto productImage = userService.selectProductImageById(productIds.get(i));
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+count.get(i));
+            int totalPrice = productDto.getPrice() * count.get(i);  // 상품 가격 * 수량
+            totalPriceSum += totalPrice;  // 총 금액에 더하기
+
             map.put("productDto", productDto);
             map.put("productImage", productImage);
-            int totalPrice = productDto.getPrice()*count.get(i);
             map.put("totalPrice",totalPrice);
             map.put("size", size);
             map.put("color", color);
@@ -307,6 +308,7 @@ public class UserController {
         }
         model.addAttribute("list", list);
         model.addAttribute("userDto", userDto);
+        model.addAttribute("totalPriceSum", totalPriceSum);  // 총 금액 전달
 
 
         return "/user/orderPage";
