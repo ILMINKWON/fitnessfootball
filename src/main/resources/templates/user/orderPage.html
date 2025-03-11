@@ -85,15 +85,15 @@
           </div>
         </div>
       </div>
-      <div class="row">
+      <div class="row text-end">
         <div class="col fw-bold ms-2 mt-3" style="font-size: large;">
           배송 정보
         </div>
         <div class="col m-0 mt-3">
-          <button id="saveAddressButton" class="btn btn-sm btn-outline-primary">배송지 추가</button>
+          <button id="saveAddressButton" class="btn btn-primary btn-sm btn-outline-primary" style="width: 100px; height: 30px; color: white;">배송지 추가</button>
         </div>
         <div class="col me-3 mt-3">
-          <span><button id="changeAddressModal" class="btn btn-sm btn-outline-primary">배송지 변경</button> </span>
+          <span><button id="changeAddressModal" class="btn btn-primary btn-sm btn-outline-primary" style="width: 100px; height: 30px; color: white;">배송지 변경</button> </span>
         </div>
       </div>
       <div class="row">
@@ -121,16 +121,37 @@
         </div>
       </div>
       <div class="row">
-        <div class="col border-bottom border-5 pb-3 mt-3 mx-2">
+        <div class="col border-bottom pb-3 mt-3 mx-2">
           <span class="fw-bold" style="font-size: large;">최종 결제 금액</span>
           <div class="row mt-3">
-            <div class="col">
+            <div class="col" style="color: gray; font-size: 0.9rem;">
               <span>상품가격</span> 
             </div>
-            <div class="col">
-              <span th:text="${#numbers.formatInteger(totalPriceSum, 3, 'COMMA') + '원'}"></span> 
+            <div class="col" style="color: gray; font-size: 0.9rem;">
+              <span id="productPrice" th:text="${#numbers.formatInteger(totalPriceSum, 3, 'COMMA') + '원'}"></span> 
             </div>
           </div>
+          <div class="row mt-3">
+            <div class="col" style="color: gray; font-size: 0.9rem;">
+              <span>배송비</span> 
+            </div>
+            <div class="col" style="color: gray; font-size: 0.9rem;">
+              <span id="deliveryFee" th:text="${#numbers.formatInteger(deliveryfee, 3, 'COMMA') + '원'}"></span> 
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col pb-3 mt-3 mx-2 fw-bold" style="font-size: 0.9rem;">
+          총 결제 금액
+        </div>
+        <div class="col pb-3 mt-3 me-4 fw-bold" style="font-size: 1.2rem; color: blue;">
+          <span id="totalPrice">총 결제금액</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col d-flex justify-content-center text-center">
+          <button id="kakaoPay" class="btn btn-primary w-100 fw-bold">결제하기</button>
         </div>
       </div>
     </div>
@@ -277,10 +298,6 @@
         alert("배송 정보 저장에 실패했습니다.");
       }
     })
-    .catch(error => {
-      console.error("에러 발생:", error);
-      alert("오류가 발생했습니다.");
-    });
   });
 
 
@@ -353,7 +370,20 @@
         console.error("배송지 목록을 불러오는 중 오류 발생:", error);
       });
   });
-});
+ // 총 결제 금액 계산
+      let productPriceElement = document.getElementById("productPrice");
+        let deliveryFeeElement = document.getElementById("deliveryFee");
+
+        let productPrice = parseInt(productPriceElement.textContent.replace(/[^0-9]/g, ""), 10); // 가격에서 숫자만 추출
+        let deliveryFee = parseInt(deliveryFeeElement.textContent.replace(/[^0-9]/g, ""), 10); // 가격에서 숫자만 추출
+
+        let totalPrice2 = productPrice + deliveryFee;  // 총 금액 계산
+
+        let totalPriceElement = document.getElementById("totalPrice");
+        totalPriceElement.innerHTML = totalPrice2.toLocaleString() + "원";  // 콤마 형식으로 출력
+
+
+      });
     
       function searchAddress() {
     new daum.Postcode({
@@ -383,6 +413,31 @@
         let addressModal = bootstrap.Modal.getInstance(document.getElementById("addressModal"));
         addressModal.hide();
       });
+
+      document.getElementById("kakaoPay").addEventListener("click", function () {
+      let totalAmount = parseInt(document.getElementById("totalPrice").innerText.replace(/[^0-9]/g, ""), 10);
+
+      fetch("/api/kakao/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: totalAmount,
+          orderId: "order1234", // 주문번호 (동적으로 생성할 수도 있음)
+        }),
+      })
+        .then((r) => r.json())
+        .then((response) => {
+          if (response.success) {
+            window.location.href = response.redirectUrl; // 카카오페이 결제 페이지로 이동
+          } else {
+            alert("결제 요청 실패");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("결제 요청 중 오류 발생");
+        });
+    });
     </script>
   </body>
 </html>

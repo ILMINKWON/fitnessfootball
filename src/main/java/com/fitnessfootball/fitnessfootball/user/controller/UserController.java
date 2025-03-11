@@ -285,7 +285,7 @@ public class UserController {
 
 
     @RequestMapping("orderPage")
-    public String orderPage(@RequestParam(value = "id[]") List<Integer> productIds, @RequestParam(name = "count[]") List<Integer> count, @RequestParam(name = "size", required = false) String size, @RequestParam(name = "color", required = false) String color, Model model, HttpSession session){
+    public String orderPage(@RequestParam(value = "id[]") List<Integer> productIds, @RequestParam(name = "count[]") List<Integer> count, @RequestParam(name = "size", required = false) String size, @RequestParam(name = "color", required = false) String color,@RequestParam(name = "deliveryfee", required=false)Integer deliveryfee, Model model, HttpSession session){
 
         UserDto userDto = (UserDto) session.getAttribute("user");
         List<Map<String,Object>> list = new ArrayList<>();
@@ -309,9 +309,11 @@ public class UserController {
         model.addAttribute("list", list);
         model.addAttribute("userDto", userDto);
         model.addAttribute("totalPriceSum", totalPriceSum);  // 총 금액 전달
+        model.addAttribute("deliveryfee", deliveryfee);
+        System.out.println("deliveryfee >>>> " + deliveryfee);
 
 
-        return "/user/orderPage";
+        return "user/orderPage";
         
     }
     // @RequestMapping("addressProcess")
